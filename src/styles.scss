@@ -1,0 +1,24 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$AM-Dashboard-primary: mat.define-palette(mat.$indigo-palette);
+$AM-Dashboard-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+$AM-Dashboard-warn: mat.define-palette(mat.$red-palette);
+
+$AM-Dashboard-theme: mat.define-light-theme((
+  color: (
+    primary: $AM-Dashboard-primary,
+    accent: $AM-Dashboard-accent,
+    warn: $AM-Dashboard-warn,
+  )
+));
+
+@include mat.all-component-themes($AM-Dashboard-theme);
+
+.page {
+  background-color: #3C91B0;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Arial, "Helvetica Neue", sans-serif; }
