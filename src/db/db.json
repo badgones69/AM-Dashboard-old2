@@ -313,7 +313,7 @@
     {"id": 98, "isoAlpha2": "WY", "name": "WYOMING", "countryId": 62}
   ],
   "airlines": [
-    {"icao": "XXX", "name": "X"}
+    {"id": 1, "icao": "XXX", "name": "X"}
   ],
   "models": [
     {"id": 1, "designation": "Caravelle 12", "manufacturer": "AEROSPATIALE"},
