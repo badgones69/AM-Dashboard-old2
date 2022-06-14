@@ -1,0 +1,100 @@
+<mat-toolbar>
+  <button mat-button (click)="menuToogle()">
+    <mat-icon *ngIf="!menuOpened">menu</mat-icon>
+    <mat-icon *ngIf="menuOpened">chevron_left</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav mode="side" [opened]="menuOpened">
+
+    <!-- AIRLINE MENU -->
+    <button mat-button (click)="airlineMenuToogle()" class="menu-button">
+      <mat-icon *ngIf="!airlineMenuExpanded">chevron_right</mat-icon>
+      <mat-icon *ngIf="airlineMenuExpanded">expand_more</mat-icon>
+      <mat-icon>domain</mat-icon>
+      <span>Compagnie</span>
+    </button>
+    <button mat-button *ngIf="airlineMenuExpanded" class="submenu-button">
+      <mat-icon>edit</mat-icon>
+      <span>Modifier</span>
+    </button>
+
+    <!-- HUB MENU -->
+    <button mat-button (click)="hubMenuToogle()" class="menu-button">
+      <mat-icon *ngIf="!hubMenuExpanded">chevron_right</mat-icon>
+      <mat-icon *ngIf="hubMenuExpanded">expand_more</mat-icon>
+      <mat-icon>share</mat-icon>
+      <span>Hub</span>
+    </button>
+    <button mat-button *ngIf="hubMenuExpanded" class="submenu-button">
+      <mat-icon>insert_chart</mat-icon>
+      <span>Stats</span>
+    </button>
+    <button mat-button *ngIf="hubMenuExpanded" class="submenu-button">
+      <mat-icon>list</mat-icon>
+      <span>Liste</span>
+    </button>
+    <button mat-button *ngIf="hubMenuExpanded" class="submenu-button">
+      <mat-icon>add</mat-icon>
+      <span>Ajouter</span>
+    </button>
+
+    <!-- AIRCRAFT MENU -->
+    <button mat-button (click)="aircraftMenuToogle()" class="menu-button">
+      <mat-icon *ngIf="!aircraftMenuExpanded">chevron_right</mat-icon>
+      <mat-icon *ngIf="aircraftMenuExpanded">expand_more</mat-icon>
+      <mat-icon>airplanemode_active</mat-icon>
+      <span>Avion</span>
+    </button>
+    <button mat-button *ngIf="aircraftMenuExpanded" class="submenu-button">
+      <mat-icon>insert_chart</mat-icon>
+      <span>Stats</span>
+    </button>
+    <button mat-button *ngIf="aircraftMenuExpanded" class="submenu-button">
+      <mat-icon>list</mat-icon>
+      <span>Liste</span>
+    </button>
+    <button mat-button *ngIf="aircraftMenuExpanded" class="submenu-button">
+      <mat-icon>add</mat-icon>
+      <span>Ajouter</span>
+    </button>
+
+    <!-- ROUTE MENU -->
+    <button mat-button (click)="routeMenuToogle()" class="menu-button">
+      <mat-icon *ngIf="!routeMenuExpanded">chevron_right</mat-icon>
+      <mat-icon *ngIf="routeMenuExpanded">expand_more</mat-icon>
+      <mat-icon>place</mat-icon>
+      <span>Ligne</span>
+    </button>
+    <button mat-button *ngIf="routeMenuExpanded" class="submenu-button">
+      <mat-icon>insert_chart</mat-icon>
+      <span>Stats</span>
+    </button>
+    <button mat-button *ngIf="routeMenuExpanded" class="submenu-button">
+      <mat-icon>list</mat-icon>
+      <span>Liste</span>
+    </button>
+    <button mat-button *ngIf="routeMenuExpanded" class="submenu-button">
+      <mat-icon>add</mat-icon>
+      <span>Ajouter</span>
+    </button>
+
+    <!-- HELP MENU -->
+    <button mat-button (click)="helpMenuToogle()" class="menu-button">
+      <mat-icon *ngIf="!helpMenuExpanded">chevron_right</mat-icon>
+      <mat-icon *ngIf="helpMenuExpanded">expand_more</mat-icon>
+      <mat-icon>help</mat-icon>
+      <span>Aide</span>
+    </button>
+    <button mat-button *ngIf="helpMenuExpanded" class="submenu-button">
+      <mat-icon>info</mat-icon>
+      <span>À propos</span>
+    </button>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="content mat-elevation-z4">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
