@@ -12,6 +12,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatDialogModule} from "@angular/material/dialog";
 import {HomeModule} from "./home/home.module";
 import {HttpClientModule} from "@angular/common/http";
+import {HelpModule} from "./help/help.module";
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {HttpClientModule} from "@angular/common/http";
     MatButtonModule,
     MatDialogModule,
     HomeModule,
+    HelpModule,
     ToastrModule.forRoot(),
     AppRoutingModule
   ],

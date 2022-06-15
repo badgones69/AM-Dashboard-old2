@@ -87,7 +87,7 @@
       <mat-icon>help</mat-icon>
       <span>Aide</span>
     </button>
-    <button mat-button *ngIf="helpMenuExpanded" class="submenu-button">
+    <button mat-button (click)="openAboutDialog()" *ngIf="helpMenuExpanded" class="submenu-button">
       <mat-icon>info</mat-icon>
       <span>À propos</span>
     </button>

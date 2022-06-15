@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
+import {PageAboutComponent} from "./help/pages/page-about/page-about.component";
 
 @Component({
   selector: 'app-root',
@@ -50,5 +51,9 @@ export class AppComponent implements OnInit {
 
   helpMenuToogle() {
     this.helpMenuExpanded = !this.helpMenuExpanded;
+  }
+
+  openAboutDialog() {
+    this.dialog.open(PageAboutComponent);
   }
 }
