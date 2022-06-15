@@ -1,0 +1,86 @@
+<h1 class="formTitle">{{hubFormTitle}}</h1>
+
+<form [formGroup]="hubForm" (ngSubmit)="submitHubForm()">
+  <div>
+    <mat-form-field id="iataFormField" appearance="standard">
+      <mat-label class="formInputLabel">IATA</mat-label>
+      <input matInput placeholder="XXX" minlength="3" maxlength="3" pattern="[A-Z]{3}" [formControl]="iata">
+    </mat-form-field>
+    <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidIATA()">
+        {{iataFieldErrorMessage}}
+      </span>
+    </div>
+  </div>
+
+  <div>
+    <mat-form-field id="nameFormField" appearance="standard">
+      <mat-label class="formInputLabel">NOM</mat-label>
+      <input matInput [formControl]="name">
+    </mat-form-field>
+  </div>
+
+  <div>
+    <mat-slide-toggle *ngIf="this.name.value && this.name.value.trim() != ''" color="primary" (change)="cityIncludedInName = !cityIncludedInName">
+      ville incluse dans le nom
+    </mat-slide-toggle>
+  </div>
+
+  <div>
+    <mat-form-field id="cityFormField" appearance="standard">
+      <mat-label class="formInputLabel">VILLE</mat-label>
+      <input placeholder="villes multiples à séparer par une virgule puis un espace" matInput [formControl]="city">
+    </mat-form-field>
+    <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidCity()">
+        {{emptyRequiredFieldErrorMessage}}
+      </span>
+    </div>
+  </div>
+
+  <div>
+    <span id="flagAirportCountrySelected" class="fi fi-{{flagAirportCountry}}"></span>
+    <mat-form-field id="countryFormField" appearance="standard">
+      <mat-label class="formInputLabel">PAYS</mat-label>
+      <input matInput [matAutocomplete]="auto" [formControl]="country">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCountryByName"
+                        (optionSelected)="addCountryListener($event.option.value)">
+        <mat-option *ngFor="let country of filteredCountries | async" [value]="country">
+          <span class="fi fi-{{country.isoAlpha2}} flagsList"></span> {{country.name}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidCountry()">
+        {{countryFieldErrorMessage}}
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="countrySelectedHasRegions">
+    <span id="flagAirportRegionSelected">
+      <img [src]="flagAirportRegion" alt="drapeau de l'État/Province {{this.hubForm.value.region ? this.hubForm.value.region.name : 'X'}}, dans le pays {{this.hubForm.value.country.name}}">
+    </span>
+    <mat-form-field id="regionFormField" appearance="standard">
+      <mat-label class="formInputLabel">ÉTAT / PROVINCE</mat-label>
+      <input matInput [matAutocomplete]="auto" [formControl]="region">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayRegionByName">
+        <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+          <span class="flagsList">
+            <img src="assets/regions-flag/{{this.hubForm.value.country.isoAlpha2}}/{{region.isoAlpha2}}.svg" alt="drapeau de l'État/Province {{this.hubForm.value.region ? this.hubForm.value.region.name : 'X'}}, dans le pays {{this.hubForm.value.country.name}}">
+          </span> {{region.name}} ({{region.isoAlpha2}})
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidRegion()">
+        {{regionFieldErrorMessage}}
+      </span>
+    </div>
+  </div>
+
+  <div class="formButtons">
+    <button type="submit" class="formButton validFormButton">Enregistrer</button>
+    <button type="reset" class="formButton resetFormButton" (click)="resetHubForm()">Réinitialiser</button>
+  </div>
+</form>

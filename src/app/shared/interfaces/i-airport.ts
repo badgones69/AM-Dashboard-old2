@@ -5,7 +5,7 @@ export interface IAirport {
   id: number,
   iata: string,
   name: string,
-  city: number,
+  city: string,
   country: Country,
   region: Region | null,
   hub: boolean
