@@ -7,6 +7,11 @@ const routes: Routes = [
     path: 'hub',
     loadChildren:() =>
       import ('./hub/hub.module').then((m) => m.HubModule)
+  },
+  {
+    path: 'route',
+    loadChildren:() =>
+      import ('./route/route.module').then((m) => m.RouteModule)
   }
 ];
 

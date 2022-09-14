@@ -5,5 +5,6 @@ export const HTTP_POST_REQUEST = 'POST';
 
 export const AIRLINE_SERVICE_URL = `${API_URL}/airlines/`;
 export const AIRPORT_SERVICE_URL = `${API_URL}/airports/`;
+export const ROUTE_SERVICE_URL = `${API_URL}/routes/`;
 export const COUNTRY_SERVICE_URL = `${API_URL}/countries/`;
 export const REGION_SERVICE_URL = `${API_URL}/regions/`;

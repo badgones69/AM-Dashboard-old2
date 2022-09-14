@@ -1,0 +1,138 @@
+<h1 class="formTitle" style="margin-bottom: 30px">{{routeFormTitle}}</h1>
+
+<form [formGroup]="routeForm" (ngSubmit)="submitRouteForm()">
+  <div>
+    <span class="flagElementSelected fi fi-{{flagDepartureHubCountry}}"></span>
+    <mat-form-field id="departureHubFormField" appearance="standard">
+      <mat-label class="formInputLabel">HUB DE DÉPART</mat-label>
+      <input matInput [matAutocomplete]="auto" [formControl]="departureHub">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayAirportByName">
+        <mat-option *ngFor="let hub of filteredDepartureHubs | async" [value]="hub">
+          <span class="fi fi-{{hub.country.isoAlpha2}} flagsList"></span> <span class="airportsList">{{hub.iata}}</span> {{hub.name}} {{hub.region ? '(' + hub.region.isoAlpha2 + ')' : ''}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidDepartureHub()">
+        {{departureHubFieldErrorMessage}}
+      </span>
+    </div>
+  </div>
+
+  <div>
+    <mat-slide-toggle color="primary" [checked]="existingArrivalAirport" (change)="addArrivalAirportTypeListener()">
+      aéroport d'arrivée déjà existant
+    </mat-slide-toggle>
+  </div>
+
+  <div *ngIf="existingArrivalAirport">
+    <div>
+      <span class="flagElementSelected fi fi-{{flagArrivalAirport}}"></span>
+      <mat-form-field id="arrivalAirportFormField" appearance="standard">
+        <mat-label class="formInputLabel">AÉROPORT D'ARRIVÉE</mat-label>
+        <input matInput [matAutocomplete]="auto" [formControl]="arrivalAirportSelected">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayAirportByName">
+          <mat-option *ngFor="let airport of filteredArrivalAirports | async" [value]="airport">
+            <span class="fi fi-{{airport.country.isoAlpha2}} flagsList"></span> <span class="airportsList">{{airport.iata}}</span> {{airport.name}} {{airport.region ? '(' + airport.region.isoAlpha2 + ')' : ''}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <div>
+      <span class="formErrorMessage" *ngIf="formSubmitted && !isValidArrivalAirport()">
+        {{arrivalAirportFieldErrorMessage}}
+      </span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!existingArrivalAirport">
+    <div>
+      <mat-form-field id="iataFormField" appearance="standard">
+        <mat-label class="formInputLabel">IATA</mat-label>
+        <input matInput placeholder="XXX" minlength="3" maxlength="3" pattern="[A-Z]{3}" [formControl]="newArrivalAirportIATA">
+      </mat-form-field>
+      <div>
+        <span class="formErrorMessage" *ngIf="formSubmitted && !isValidIATA()">
+          {{iataFieldErrorMessage}}
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <mat-form-field id="nameFormField" appearance="standard">
+        <mat-label class="formInputLabel">NOM</mat-label>
+        <input matInput [formControl]="newArrivalAirportName">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-slide-toggle *ngIf="this.newArrivalAirportName.value && this.newArrivalAirportName.value.trim() != ''" color="primary" (change)="cityIncludedInName = !cityIncludedInName">
+        ville incluse dans le nom
+      </mat-slide-toggle>
+    </div>
+
+    <div>
+      <mat-form-field id="cityFormField" appearance="standard">
+        <mat-label class="formInputLabel">VILLE</mat-label>
+        <input placeholder="villes multiples à séparer par une virgule puis un espace" matInput [formControl]="newArrivalAirportCity">
+      </mat-form-field>
+      <div>
+        <span class="formErrorMessage" *ngIf="formSubmitted && !isValidCity()">
+          {{emptyRequiredFieldErrorMessage}}
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <mat-slide-toggle color="primary" [checked]="newArrivalAirportCharacteristicsCaseRespected" (change)="newArrivalAirportCharacteristicsCaseRespected = !newArrivalAirportCharacteristicsCaseRespected">
+        respecter la casse pour le nom et/ou la ville
+      </mat-slide-toggle>
+    </div>
+
+    <div>
+      <span class="flagElementSelected fi fi-{{flagNewArrivalAirportCountry}}"></span>
+      <mat-form-field id="countryFormField" appearance="standard">
+        <mat-label class="formInputLabel">PAYS</mat-label>
+        <input matInput [matAutocomplete]="auto" [formControl]="newArrivalAirportCountry">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCountryByName"
+                          (optionSelected)="addCountryListener($event.option.value)">
+          <mat-option *ngFor="let country of filteredCountries | async" [value]="country">
+            <span class="fi fi-{{country.isoAlpha2}} flagsList"></span> {{country.name}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <div>
+        <span class="formErrorMessage" *ngIf="formSubmitted && !isValidCountry()">
+          {{countryFieldErrorMessage}}
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="countrySelectedHasRegions">
+      <span id="flagRegionSelected" class="flagElementSelected">
+        <img [src]="flagNewArrivalAirportRegion">
+      </span>
+      <mat-form-field id="regionFormField" appearance="standard">
+        <mat-label class="formInputLabel">ÉTAT / PROVINCE</mat-label>
+        <input matInput [matAutocomplete]="auto" [formControl]="newArrivalAirportRegion">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayRegionByName">
+          <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+            <span class="flagsList">
+              <img src="assets/regions-flag/{{this.routeForm.value.country.isoAlpha2}}/{{region.isoAlpha2}}.svg">
+            </span> {{region.name}} ({{region.isoAlpha2}})
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <div>
+        <span class="formErrorMessage" *ngIf="formSubmitted && !isValidRegion()">
+          {{regionFieldErrorMessage}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px">
+    <button type="submit" class="formButton validFormButton">Enregistrer</button>
+    <button type="reset" class="formButton resetFormButton" (click)="resetRouteForm()">Réinitialiser</button>
+  </div>
+</form>

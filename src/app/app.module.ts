@@ -14,6 +14,7 @@ import {HomeModule} from "./home/home.module";
 import {HttpClientModule} from "@angular/common/http";
 import {HelpModule} from "./help/help.module";
 import {HubModule} from "./hub/hub.module";
+import {RouteModule} from "./route/route.module";
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import {HubModule} from "./hub/hub.module";
     HomeModule,
     HelpModule,
     HubModule,
+    RouteModule,
     ToastrModule.forRoot(),
     AppRoutingModule
   ],
