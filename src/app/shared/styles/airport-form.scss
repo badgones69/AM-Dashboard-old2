@@ -6,7 +6,7 @@
   width:458px !important;
 }
 
-#countryFormField, #regionFormField {
+#departureHubFormField, #arrivalAirportFormField, #countryFormField, #regionFormField {
   width:430px !important;
 }
 
@@ -19,11 +19,15 @@
   }
 }
 
-#flagAirportCountrySelected, #flagAirportRegionSelected {
+.airportsList {
+  font-weight: bold;
+}
+
+.flagElementSelected {
   margin-right: 10px;
 }
 
-#flagAirportRegionSelected {
+#flagRegionSelected {
   width:430px !important;
 
   img {

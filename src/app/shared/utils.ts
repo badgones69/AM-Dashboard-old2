@@ -1,74 +1,83 @@
-export function buildAirportName(airportName: string, airportCity: string, airportNameIncludesCity: boolean): string {
-  if(airportName != null) {
-    airportName = formatAirportCharacteristic(airportName.trim());
-  }
-
+export function buildAirportName(airportName: string, airportNameCaseRespected: boolean, airportNameIncludesCity: boolean, airportCity: string): string {
   if(airportName === null || airportName === '') {
-    return formatMultipleAirportCities(airportCity);
+    return formatAirportCity(airportCity, true, airportCity.indexOf(',') > -1);
   } else {
+    airportName = formatAirportName(airportName.trim(), airportNameCaseRespected);
+
     if (airportNameIncludesCity) {
-      airportCity = formatAirportCharacteristic(airportCity);
-      return `${airportCity} — ${airportName}`;
+      return `${airportCity} – ${airportName}`;
     } else {
       return airportName;
     }
   }
 }
 
-export function formatAirportCharacteristic(airportCharacteristic: string): string {
-  let airportNameWords = airportCharacteristic.toLowerCase().split(' ');
+export function formatAirportName(airportName: string, airportNameCaseRespected: boolean) {
+  return formatAirportCharacteristic(airportName, airportNameCaseRespected);
+}
 
-  for (let i = 0; i < airportNameWords.length; i++) {
-    airportNameWords[i] = airportNameWords[i].trim();
+export function formatAirportCity(airportCity: string, airportCityCaseRespected: boolean, airportCompoundCitiesInName?: boolean): string {
+  let airportCities = airportCity.split(',');
 
-    const compoundSymbolIndex = airportNameWords[i].indexOf('-');
+  for(let i = 0; i < airportCities.length; i++) {
+    airportCities[i] = formatAirportCharacteristic(airportCities[i].trim(), airportCityCaseRespected);
+  }
+
+  if(airportCompoundCitiesInName) {
+    return airportCities.join(' – ');
+  } else {
+    return airportCities.join(', ');
+  }
+}
+
+function formatAirportCharacteristic(airportCharacteristic: string, characteristicCaseRespected: boolean): string {
+  let airportCharacteristicWords = airportCharacteristic.split(' ');
+
+  for (let i = 0; i < airportCharacteristicWords.length; i++) {
+    airportCharacteristicWords[i] = airportCharacteristicWords[i].trim();
+
+    const compoundSymbolIndex = airportCharacteristicWords[i].indexOf('-');
 
     if(compoundSymbolIndex > -1) {
       if(compoundSymbolIndex === 0) {
-        airportNameWords[i] = airportNameWords[i].replace(airportNameWords[i].charAt(0), '');
+        airportCharacteristicWords[i] = airportCharacteristicWords[i].replace(airportCharacteristicWords[i].charAt(0), '');
       }
 
-      let airportNameCompoundWords = airportNameWords[i].split('-');
+      let airportCharacteristicCompoundWords = airportCharacteristicWords[i].split('-');
 
-      for (let j = 0; j < airportNameCompoundWords.length; j++) {
-        airportNameCompoundWords[j] = airportNameCompoundWords[j].trim();
-        airportNameCompoundWords[j] = capitalizeFirstLetter(airportNameCompoundWords[j]);
+      for (let j = 0; j < airportCharacteristicCompoundWords.length; j++) {
+        airportCharacteristicCompoundWords[j] = airportCharacteristicCompoundWords[j].trim();
+
+        if(!characteristicCaseRespected) {
+          airportCharacteristicCompoundWords[j] = capitalizeFirstLetter(airportCharacteristicCompoundWords[j]);
+        }
       }
-      airportNameWords[i] = airportNameCompoundWords.join('-');
-    } else {
-      airportNameWords[i] = capitalizeFirstLetter(airportNameWords[i]);
+      airportCharacteristicWords[i] = airportCharacteristicCompoundWords.join('-');
+    } else if(!characteristicCaseRespected) {
+      airportCharacteristicWords[i] = capitalizeFirstLetter(airportCharacteristicWords[i]);
     }
   }
-  return airportNameWords.join(' ');
+  return airportCharacteristicWords.join(' ');
 }
 
-export function capitalizeFirstLetter(word: string): string {
-  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-}
+function capitalizeFirstLetter(word: string): string {
+  let wordTransformed = word.charAt(0);
+  let apostrophesIndex: number[] = [];
 
-export function formatMultipleAirportCities(multipleAirportCities: string): string {
-  let airportCities = multipleAirportCities.toLowerCase().split(',');
-
-  for (let i = 0; i < airportCities.length; i++) {
-    airportCities[i] = airportCities[i].trim();
-
-    const compoundSymbolIndex = airportCities[i].indexOf('-');
-
-    if(compoundSymbolIndex > -1) {
-      if(compoundSymbolIndex === 0) {
-        airportCities[i] = airportCities[i].replace(airportCities[i].charAt(0), '');
-      }
-
-      let airportCityCompoundWords = airportCities[i].split('-');
-
-      for (let j = 0; j < airportCityCompoundWords.length; j++) {
-        airportCityCompoundWords[j] = airportCityCompoundWords[j].trim();
-        airportCityCompoundWords[j] = capitalizeFirstLetter(airportCityCompoundWords[j]);
-      }
-      airportCities[i] = airportCityCompoundWords.join('-');
-    } else {
-      airportCities[i] = capitalizeFirstLetter(airportCities[i]);
+  for(let i = 0; i < word.length; i++) {
+    if (word[i] === "'") {
+      apostrophesIndex.push(i);
     }
   }
-  return airportCities.join('—');
+
+  if(apostrophesIndex.length === 0) {
+    return wordTransformed.toUpperCase() + word.slice(1).toLowerCase();
+  } else {
+    let charsAfterApostrophe: any[] = [];
+    apostrophesIndex.forEach(index => charsAfterApostrophe.push({index : index + 1, value : word.charAt(index + 1)}));
+    wordTransformed += word.slice(1).toLowerCase();
+    charsAfterApostrophe.forEach(char => wordTransformed = wordTransformed.substring(0, char.index) + char.value.toUpperCase() + wordTransformed.substring(char.index + 1));
+
+    return wordTransformed;
+  }
 }

@@ -39,7 +39,13 @@
   </div>
 
   <div>
-    <span id="flagAirportCountrySelected" class="fi fi-{{flagAirportCountry}}"></span>
+    <mat-slide-toggle color="primary" [checked]="characteristicsCaseRespected" (change)="characteristicsCaseRespected = !characteristicsCaseRespected">
+      respecter la casse pour le nom et/ou la ville
+    </mat-slide-toggle>
+  </div>
+
+  <div>
+    <span class="flagElementSelected fi fi-{{flagAirportCountry}}"></span>
     <mat-form-field id="countryFormField" appearance="standard">
       <mat-label class="formInputLabel">PAYS</mat-label>
       <input matInput [matAutocomplete]="auto" [formControl]="country">
@@ -58,8 +64,8 @@
   </div>
 
   <div *ngIf="countrySelectedHasRegions">
-    <span id="flagAirportRegionSelected">
-      <img [src]="flagAirportRegion" alt="drapeau de l'État/Province {{this.hubForm.value.region ? this.hubForm.value.region.name : 'X'}}, dans le pays {{this.hubForm.value.country.name}}">
+    <span id="flagRegionSelected" class="flagElementSelected">
+      <img [src]="flagAirportRegion">
     </span>
     <mat-form-field id="regionFormField" appearance="standard">
       <mat-label class="formInputLabel">ÉTAT / PROVINCE</mat-label>
@@ -67,7 +73,7 @@
       <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayRegionByName">
         <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
           <span class="flagsList">
-            <img src="assets/regions-flag/{{this.hubForm.value.country.isoAlpha2}}/{{region.isoAlpha2}}.svg" alt="drapeau de l'État/Province {{this.hubForm.value.region ? this.hubForm.value.region.name : 'X'}}, dans le pays {{this.hubForm.value.country.name}}">
+            <img src="assets/regions-flag/{{this.hubForm.value.country.isoAlpha2}}/{{region.isoAlpha2}}.svg">
           </span> {{region.name}} ({{region.isoAlpha2}})
         </mat-option>
       </mat-autocomplete>

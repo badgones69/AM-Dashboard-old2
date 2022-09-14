@@ -11,7 +11,11 @@ export class AirportService {
 
   constructor(private http: HttpClient) {}
 
-  public createAirport(airport: Airport): Observable<Airport> {
+  public getAirports():Observable<Airport[]> {
+    return this.http.get<Airport[]>(`${AIRPORT_SERVICE_URL}`);
+  }
+
+  public createAirport(airport: any): Observable<Airport> {
     return this.http.post<Airport>(`${AIRPORT_SERVICE_URL}`, airport);
   }
 }

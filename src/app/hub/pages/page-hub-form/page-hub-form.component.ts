@@ -9,6 +9,7 @@ import {Airport} from "../../../shared/models/airport";
 import {AirportService} from "../../../shared/services/airport.service";
 import {
   ADDING_HUB_FORM_TITLE,
+  ALREADY_EXISTING_AIRPORT_ERROR_MESSAGE,
   EMPTY_COUNTRY_FLAG,
   EMPTY_REGION_FLAG,
   EMPTY_REQUIRED_FIELD_ERROR_MESSAGE,
@@ -18,7 +19,7 @@ import {
   UNKNOWN_REGION_ERROR_MESSAGE
 } from "../../../shared/constants/form-constants";
 import {NotificationService} from "../../../shared/services/notification.service";
-import {buildAirportName, formatAirportCharacteristic} from "../../../shared/utils";
+import {buildAirportName, formatAirportCity} from "../../../shared/utils";
 import {COUNTRIES_WITH_REGIONS} from "../../../shared/constants/app-constants";
 
 @Component({
@@ -35,7 +36,8 @@ export class PageHubFormComponent implements OnInit {
   public hubFormTitle = ADDING_HUB_FORM_TITLE;
   public iata:FormControl = new FormControl();
   public name:FormControl = new FormControl();
-  public cityIncludedInName:boolean = false;
+  public cityIncludedInName: boolean = false;
+  public characteristicsCaseRespected: boolean = false;
   public city:FormControl = new FormControl();
   public country:FormControl = new FormControl();
   public region:FormControl = new FormControl();
@@ -46,6 +48,9 @@ export class PageHubFormComponent implements OnInit {
   public countrySelectedHasRegions!: boolean;
   // Flag of potential current selected region
   public flagAirportRegion!: string;
+
+  // List of all airports
+  public allAirports: Airport[] = [];
 
   // List of available countries
   public countries: Country[] = [];
@@ -60,9 +65,9 @@ export class PageHubFormComponent implements OnInit {
   public formSubmitted: boolean = false;
   // Custom error message for IATA field (if it's invalid)
   public iataFieldErrorMessage!: string;
-  // Custom error message for country field (if it's invalid)
+  // Custom error message for Country field (if it's invalid)
   public countryFieldErrorMessage!: string;
-  // Custom error message for region field (if it's invalid)
+  // Custom error message for Region field (if it's invalid)
   public regionFieldErrorMessage!: string;
   // Generic error message for required but empty field(s)
   public emptyRequiredFieldErrorMessage: string = EMPTY_REQUIRED_FIELD_ERROR_MESSAGE;
@@ -80,6 +85,11 @@ export class PageHubFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.setDefaultCountry();
+
+    this.airportService.getAirports().subscribe(airports => {
+      Object.assign(this.allAirports, airports);
+    });
+
     this.configureCountryFieldAutocomplete();
 
     this.country.valueChanges.subscribe(countryValueChanged => this.addCountryListener(countryValueChanged));
@@ -89,7 +99,13 @@ export class PageHubFormComponent implements OnInit {
   private setDefaultCountry() {
     this.flagAirportCountry = EMPTY_COUNTRY_FLAG;
     this.countrySelectedHasRegions = false;
+    this.setDefaultRegion();
+  }
+
+  // Region definition (with default value)
+  private setDefaultRegion() {
     this.flagAirportRegion = EMPTY_REGION_FLAG;
+    this.region.setValue(null);
   }
 
   // Country field autocomplete configuration
@@ -117,7 +133,7 @@ export class PageHubFormComponent implements OnInit {
   // Region field autocomplete configuration
   private configureRegionFieldAutocomplete(countryFound: Country) {
     this.regionService.getRegionsByCountry(countryFound.id).subscribe(regionsAvailable => {
-      Object.assign(this.regions, regionsAvailable);
+      this.regions = regionsAvailable;
 
       this.filteredRegions = this.region.valueChanges.pipe(distinctUntilChanged(),
         startWith(''),
@@ -141,6 +157,7 @@ export class PageHubFormComponent implements OnInit {
         this.flagAirportCountry = countryFound.isoAlpha2;
         this.hubForm.value.country = {};
         Object.assign(this.hubForm.value.country, countryFound);
+        this.setDefaultRegion();
 
         if (COUNTRIES_WITH_REGIONS.includes(countryFound.isoAlpha2)) {
           this.configureRegionFieldAutocomplete(countryFound);
@@ -190,8 +207,8 @@ export class PageHubFormComponent implements OnInit {
 
     if(this.isValidIATA() && this.isValidCity() && this.isValidCountry() && this.isValidRegion()) {
       this.hubForm.value.iata = this.iata.value.toUpperCase();
-      this.hubForm.value.city = formatAirportCharacteristic(this.city.value.trim());
-      this.hubForm.value.name = buildAirportName(this.name.value, this.hubForm.value.city, this.cityIncludedInName);
+      this.hubForm.value.city = formatAirportCity(this.city.value.trim(), this.characteristicsCaseRespected);
+      this.hubForm.value.name = buildAirportName(this.name.value, this.characteristicsCaseRespected, this.cityIncludedInName, this.hubForm.value.city);
       this.hubAirport = this.hubForm.value;
       this.hubAirport.hub = true;
 
@@ -208,11 +225,16 @@ export class PageHubFormComponent implements OnInit {
 
   // IATA field validation
   isValidIATA() {
+    let alreadyExistingAirportsIATA: string[] = this.allAirports.map(a => a.iata);
+
     if(this.iata.value === null || this.iata.value.trim() === '') {
       this.iataFieldErrorMessage = EMPTY_REQUIRED_FIELD_ERROR_MESSAGE;
       return false;
     } else if(this.iata.value.length < 3) {
       this.iataFieldErrorMessage = INVALID_IATA_ERROR_MESSAGE;
+      return false;
+    } else if (alreadyExistingAirportsIATA.includes(this.iata.value.toUpperCase())) {
+      this.iataFieldErrorMessage = ALREADY_EXISTING_AIRPORT_ERROR_MESSAGE;
       return false;
     }
     return true;
@@ -254,6 +276,8 @@ export class PageHubFormComponent implements OnInit {
     this.formSubmitted = false;
     this.hubAirport = new Airport();
 
+    this.cityIncludedInName = false;
+    this.characteristicsCaseRespected = false;
     this.flagAirportCountry = EMPTY_COUNTRY_FLAG;
     this.countrySelectedHasRegions = false;
     this.flagAirportRegion = EMPTY_REGION_FLAG;
